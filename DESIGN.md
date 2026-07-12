@@ -1,5 +1,8 @@
 # Design Brief
 
+This document describes the high-level architecture, design decisions, and tradeoffs
+of the GitHub Event Monitor service.
+
 ## Problem Statement
 
 ## Architecture
