@@ -125,9 +125,12 @@ The following features that would normally be considered for a project of this t
 will not be included in this demonstration due to time or resource constraints:
 
 - authentication
+- secrets management
 - CI/CD pipelines
 - data query API
 - user interface
+- start/stop endpoints for service processing
+- service healthchecks
 
 The following features were intended to be included but could not due to time or resource constraints:
 
