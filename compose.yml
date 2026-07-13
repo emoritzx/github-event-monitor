@@ -1,0 +1,41 @@
+name: github-event-monitor
+
+services:
+
+  # Object Storage
+  elasticsearch:
+    environment:
+      discovery.type: single-node
+      xpack.security.enabled: "false"
+    image: elasticsearch:9.4.3
+    volumes:
+      - elasticsearch:/usr/share/elasticsearch/data:rw
+
+  # System of record
+  postgres:
+    environment:
+      POSTGRES_PASSWORD_FILE: /run/secrets/postgres-password
+    image: postgres:18.4-alpine3.24
+    restart: always
+    secrets:
+      - postgres-password
+    volumes:
+      - postgres:/var/lib/postgresql:rw
+
+  # Message Broker
+  rabbitmq:
+    env_file:
+      # rabbitmq image doesn't use RABBITMQ_DEFAULT_PASS_FILE since 3.9
+      - ./secrets/rabbitmq-credentials.env
+    image: rabbitmq:4.3.2-management-alpine
+    volumes:
+      - rabbitmq:/var/lib/rabbitmq:rw
+
+secrets:
+  postgres-password:
+    file: ./secrets/postgres-password.txt
+
+volumes:
+  elasticsearch:
+  postgres:
+  rabbitmq:
