@@ -2,15 +2,6 @@ name: github-event-monitor
 
 services:
 
-  # Debugging container
-  #
-  # Run with:
-  #   docker compose --profile debug run --rm --entrypoint ash debug
-  debug:
-    image: curlimages/curl:8.21.0
-    profiles:
-      - debug
-
   # Object Storage
   elasticsearch:
     environment:
@@ -19,6 +10,23 @@ services:
     image: elasticsearch:9.4.3
     volumes:
       - elasticsearch:/usr/share/elasticsearch/data:rw
+
+  # Event Poller
+  poller:
+    build: ./poller
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    env_file:
+      - ./secrets/rabbitmq-credentials.env
+      - ./secrets/rails.env
+    environment:
+      - GITHUB_API_DOMAIN
+      - GITHUB_API_SCHEME
+    healthcheck:
+      test: curl --fail localhost:3000/up
+    profiles:
+      - ingest
 
   # System of record
   postgres:
@@ -46,6 +54,8 @@ services:
     env_file:
       # rabbitmq image doesn't use RABBITMQ_DEFAULT_PASS_FILE since 3.9
       - ./secrets/rabbitmq-credentials.env
+    healthcheck:
+      test: rabbitmq-diagnostics -q ping
     image: rabbitmq:4.3.2-management-alpine
     volumes:
       - rabbitmq:/var/lib/rabbitmq:rw

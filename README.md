@@ -4,6 +4,12 @@ A monitoring and analysis service for GitHub events.
 
 ## Quick Start
 
+Build the local services:
+
+```bash
+docker compose build
+```
+
 Start services:
 
 ```bash
@@ -11,6 +17,12 @@ docker compose up --detach
 ```
 
 ## Ingestion
+
+Start the Event Poller service to begin requesting events from the GitHub Event API:
+
+```bash
+docker compose run --rm poller
+```
 
 ## Testing
 

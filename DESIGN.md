@@ -130,7 +130,8 @@ will not be included in this demonstration due to time or resource constraints:
 - data query API
 - user interface
 - start/stop endpoints for service processing
-- service healthchecks
+- hardening Rails applications for production
+- RabbitMQ configuration (demo uses default exchange)
 
 The following features were intended to be included but could not due to time or resource constraints:
 
