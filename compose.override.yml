@@ -1,0 +1,24 @@
+# User override settings
+#
+# I normally would not include this in the repository
+# as the settings change often during development
+# and can be different per user.
+#
+# However, I wanted to show part of the thought process
+# for doing development.
+
+services:
+
+  # Debugging container
+  #
+  # Run with:
+  #   docker compose run --rm curl [args]
+  curl:
+    image: curlimages/curl:8.21.0
+    profiles:
+      - debug
+
+  # Expose management port
+  rabbitmq:
+    ports:
+      - 15672:15672

@@ -1,5 +1,7 @@
 {
     "recommendations": [
-        "mermaidchart.vscode-mermaid-chart"
+        "mermaidchart.vscode-mermaid-chart",
+        "shopify.ruby-lsp",
+        "shopify.ruby-extensions-pack"
     ]
 }
