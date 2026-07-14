@@ -1,0 +1,13 @@
+upstream github {
+    server ${GITHUB_API_DOMAIN}:${GITHUB_API_PORT};
+}
+
+server {
+
+    listen 80;
+
+    location / {
+        proxy_pass ${GITHUB_API_SCHEME}://github;
+        proxy_set_header Host ${GITHUB_API_DOMAIN};
+    }
+}
