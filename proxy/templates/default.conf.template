@@ -6,6 +6,11 @@ server {
 
     listen 80;
 
+    location = /proxy/health {
+        default_type text/plain;
+        return 200 "Healthy";
+    }
+
     location / {
         proxy_pass ${GITHUB_API_SCHEME}://github;
         proxy_set_header Host ${GITHUB_API_DOMAIN};
