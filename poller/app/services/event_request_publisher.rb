@@ -1,7 +1,9 @@
+# Publishes event requests to the message broker
 class EventRequestPublisher
 
   attr_accessor :config
 
+  # Constructor
   def initialize
     @config = {
       host: ENV["RABBITMQ_HOST"],
@@ -12,6 +14,9 @@ class EventRequestPublisher
     }
   end
 
+  # Publish the event request
+  #
+  # A single event request is published.
   def publish
 
     connection = Bunny.new(

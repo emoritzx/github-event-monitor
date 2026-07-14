@@ -132,6 +132,7 @@ will not be included in this demonstration due to time or resource constraints:
 - start/stop endpoints for service processing
 - hardening Rails applications for production
 - RabbitMQ configuration (demo uses default exchange)
+- performance monitoring and tuning
 
 The following features were intended to be included but could not due to time or resource constraints:
 

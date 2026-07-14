@@ -4,29 +4,43 @@ A monitoring and analysis service for GitHub events.
 
 ## Quick Start
 
-Build the local services:
+Prepare the local environment by pulling the required container images
+and building the local services:
 
 ```bash
-docker compose build
+docker compose --profile '*' pull --ignore-buildable
+docker compose --profile '*' build
 ```
 
-Start services:
+Start the long-running services:
 
 ```bash
 docker compose up --detach
 ```
+
+These services are active and listening, but will not perform any computations without the initial ingest trigger.
 
 ## Ingestion
 
 Start the Event Poller service to begin requesting events from the GitHub Event API:
 
 ```bash
-docker compose run --rm poller
+docker compose --profile ingest run --rm poller
 ```
+
+Stop the Event Poller service at any time by issuing an interrupt `CTRL-C`.
 
 ## Testing
 
 ## Verification
+
+### Logs
+
+#### poller
+
+```log
+INFO: published message to queue requests
+```
 
 :warning: Make sure to include:
   - What logs to expect
