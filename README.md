@@ -15,7 +15,7 @@ docker compose --profile '*' build
 Start the long-running services:
 
 ```bash
-docker compose up --detach
+docker compose up --detach --wait
 ```
 
 These services are active and listening, but will not perform any computations without the initial ingest trigger.

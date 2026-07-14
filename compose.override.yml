@@ -22,3 +22,8 @@ services:
   rabbitmq:
     ports:
       - 15672:15672
+
+  # Override production log level
+  request-manager:
+    environment:
+      RAILS_LOG_LEVEL: debug
