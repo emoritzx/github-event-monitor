@@ -2,6 +2,15 @@ name: github-event-monitor
 
 services:
 
+  # Debugging container
+  #
+  # Run with:
+  #   docker compose --profile debug run --rm --entrypoint ash debug
+  debug:
+    image: curlimages/curl:8.21.0
+    profiles:
+      - debug
+
   # Object Storage
   elasticsearch:
     environment:
@@ -21,6 +30,16 @@ services:
       - postgres-password
     volumes:
       - postgres:/var/lib/postgresql:rw
+
+  # GitHub API Proxy
+  proxy:
+    environment:
+      - GITHUB_API_DOMAIN
+      - GITHUB_API_PORT
+      - GITHUB_API_SCHEME
+    image: nginx:1.31.2-alpine3.23-slim
+    volumes:
+      - ./proxy/templates:/etc/nginx/templates:ro
 
   # Message Broker
   rabbitmq:
