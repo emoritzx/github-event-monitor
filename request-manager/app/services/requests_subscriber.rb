@@ -15,11 +15,15 @@ class RequestsSubscriber
     @sleep_amount = 60 / requests_per_minute
   end
 
-  # Subscribe to event requests
+  # Subscribe to requests
   #
-  # A single event request is processed at a time,
+  # A single request is processed at a time,
   # which allows the subscribe loop to abide by the rate limit
   # by sleeping (see :requests_per_minute).
+  #
+  # Calls the provided onsubscribe method when a message is received.
+  # The message is not ACK'd until the onsubscribe method succeeds
+  # and the sleep timer has completed.
   def subscribe(onsubscribe)
 
     connection = Bunny.new(

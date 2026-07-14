@@ -1,4 +1,4 @@
-# Publishes event requests to the message broker
+# Publishes responses to the message broker
 class ResponsePublisher
 
   attr_accessor :config
@@ -12,9 +12,7 @@ class ResponsePublisher
     }
   end
 
-  # Publish the event request
-  #
-  # A single event request is published.
+  # Publish the response message to the given topic
   def publish(topic, message)
 
     connection = Bunny.new(

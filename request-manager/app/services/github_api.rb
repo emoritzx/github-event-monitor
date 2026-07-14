@@ -1,15 +1,30 @@
 require 'net/http'
 
+# Service client for calling the GitHub API
+#
+# Responsible for constructing the full URL
+# and setting the proper HTTP headers.
+#
+# Callers are expected to supply the path and any HTTP parameters.
+#
+# Callers are restricted to GET requests only.
 class GithubApi
 
+  # Constructor
   def initialize(options)
     @options = options
   end
 
+  # Construct base URL from environment
   def get_base_url
     "#{@options[:scheme]}://#{@options[:domain]}:#{@options[:port]}"
   end
 
+  # Submit a GET request to the API for the specified path
+  #
+  # Prepends a leading slash if not present.
+  # Configures the expected HTTP headers automatically.
+  # Returns the response object without any processing or error handling.
   def request(path)
 
     base_url = get_base_url
