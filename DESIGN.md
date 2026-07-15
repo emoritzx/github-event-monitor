@@ -149,6 +149,8 @@ will not be included in this demonstration due to time or resource constraints:
 - hardening Rails applications for production
 - RabbitMQ configuration (demo uses default exchange)
 - performance monitoring and tuning
+- coding standards checking, code quality scanning, linting
+- undeliverable messages (DLX queue)
 
 The following features were intended to be included but could not due to time or resource constraints:
 

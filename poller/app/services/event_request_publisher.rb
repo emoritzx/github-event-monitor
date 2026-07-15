@@ -6,18 +6,17 @@ class EventRequestPublisher
   # Constructor
   def initialize
     @config = {
+      exchange: "requests",
       host: ENV["RABBITMQ_HOST"],
-      message: "/events",
       password: ENV["RABBITMQ_DEFAULT_PASS"],
-      topic: "requests",
       user: ENV["RABBITMQ_DEFAULT_USER"]
     }
   end
 
   # Publish the event request
-  #
-  # A single event request is published.
-  def publish
+  def publish(page_number = 1, page_size = 15)
+
+    message = "/events?page=#{page_number}&per_page=#{page_size}"
 
     connection = Bunny.new(
       :host => @config[:host],
@@ -28,10 +27,14 @@ class EventRequestPublisher
     connection.start
 
     channel = connection.create_channel
-    queue = channel.quorum_queue(@config[:topic])
+    exchange = channel.fanout(@config[:exchange])
 
-    channel.default_exchange.publish(@config[:message], routing_key: queue.name)
-    Rails.logger.info "published message to queue #{queue.name}"
+    options = {
+      content_type: "text/plain"
+    }
+
+    exchange.publish(message, options)
+    Rails.logger.info "published message to exchange #{@config[:exchange]}"
 
     connection.close
   end

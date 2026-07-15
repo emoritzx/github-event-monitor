@@ -12,8 +12,8 @@ class ResponsePublisher
     }
   end
 
-  # Publish the response message to the given topic
-  def publish(topic, message)
+  # Publish the response message to the given exchange
+  def publish(exchange_name, message)
 
     connection = Bunny.new(
       :host => @config[:host],
@@ -24,10 +24,14 @@ class ResponsePublisher
     connection.start
 
     channel = connection.create_channel
-    queue = channel.quorum_queue(topic)
+    exchange = channel.fanout(exchange_name)
 
-    channel.default_exchange.publish(message, routing_key: queue.name)
-    Rails.logger.info "published response message to queue #{queue.name}"
+    options = {
+      content_type: "application/json"
+    }
+
+    exchange.publish(message, options)
+    Rails.logger.info "published response message to exchange #{exchange_name}"
 
     connection.close
   end

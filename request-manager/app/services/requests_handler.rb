@@ -1,3 +1,5 @@
+require 'json'
+
 # Business logic for handling a request message
 class RequestsHandler
 
@@ -25,9 +27,14 @@ class RequestsHandler
       Rails.logger.info "Data not modified since last request"
       false
     when Net::HTTPSuccess
-      topic = get_topic(message)
-      Rails.logger.info "Publishing response to #{topic}"
-      @publisher.publish(topic, response.body)
+      exchange = get_exchange(message)
+      data = {
+        path: message,
+        headers: response.to_hash,
+        body: JSON.parse(response.body)
+      }
+      Rails.logger.info "Publishing response to #{exchange}"
+      @publisher.publish(exchange, data.to_json)
       true
     else
       Rails.logger.error "Unhandled HTTP response #{response.code}"
@@ -36,8 +43,8 @@ class RequestsHandler
     end
   end
 
-  # Extracts the topic name from the original message
-  def get_topic(message)
+  # Extracts the exchange name from the original message
+  def get_exchange(message)
     /^\/?(?<api>[a-zA-Z0-9]+)/.match(message)["api"]
   end
 end

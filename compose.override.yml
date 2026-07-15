@@ -18,6 +18,11 @@ services:
     profiles:
       - debug
 
+  # Override production log level
+  poller:
+    environment:
+      RAILS_LOG_LEVEL: debug
+
   # Expose management port
   rabbitmq:
     ports:

@@ -6,9 +6,10 @@ class RequestsSubscriber
   # Constructor
   def initialize(requests_per_minute)
     @config = {
+      exchange: "requests",
       host: ENV["RABBITMQ_HOST"],
       password: ENV["RABBITMQ_DEFAULT_PASS"],
-      topic: "requests",
+      queue: "manager",
       user: ENV["RABBITMQ_DEFAULT_USER"]
     }
     @requests_per_minute = requests_per_minute
@@ -35,13 +36,15 @@ class RequestsSubscriber
     connection.start
 
     channel = connection.create_channel
-    queue = channel.quorum_queue(@config[:topic])
-
     channel.prefetch(1)
-    Rails.logger.info "Waiting for #{@config[:topic]} messages"
+
+    exchange = channel.fanout(@config[:exchange])
+    queue = channel.quorum_queue(@config[:queue]).bind(exchange)
+
+    Rails.logger.info "Waiting for #{@config[:exchange]} messages"
 
     queue.subscribe(manual_ack: true, block: true) do |delivery_info, _properties, body|
-      Rails.logger.info "Received #{@config[:topic]} message"
+      Rails.logger.info "Received #{@config[:exchange]} message"
       do_sleep = onsubscribe.call(body)
       if do_sleep
         Rails.logger.debug "Waiting #{@sleep_amount} seconds due to rate limits"
