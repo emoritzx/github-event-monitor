@@ -15,7 +15,7 @@ would get published to the `events` queue.
 This Ruby on Rails application was generated via the following command:
 
 ```bash
-rails new poller --api --skip-active-record
+rails new request-manager --api --skip-active-record
 ```
 
 SSL was disabled via `application.rb`:

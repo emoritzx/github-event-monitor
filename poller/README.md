@@ -35,5 +35,7 @@ config.force_ssl = false
 The following job was added on [startup](./config/application.rb):
 - [app/jobs/event_poller_job](./app/jobs/event_poller_job.rb)
 
-The following supporting service was added:
+The following supporting services were added:
 - [app/services/event_request_publisher](./app/services/event_request_publisher.rb)
+- [app/services/events_paginator](./app/services/events_paginator.rb)
+- [app/services/events_subscriber](./app/services/events_subscriber.rb)
