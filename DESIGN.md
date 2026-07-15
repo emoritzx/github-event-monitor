@@ -119,6 +119,22 @@ In the worst case, a single ingestion will take over 10 hours to fulfill safely.
 In reality, not all events are `PushEvents`,
 and further care can be taken to not make additional requests for data that is already in the system.
 
+### Request Caching
+
+Most GitHub API endpoints return an `ETag` response header that uniquely identifies the request.
+If a client saves the value of the header and sends it on a follow-on request with the `If-None-Match` request header,
+_and_ the server determines that there is no new data since the last request,
+the server can instead return `304 Not Modified` and the request does not count against the rate limit.
+
+> :info: There may be additional factors affecting this behavior,
+> including whether the endpoint is considered a conditional endpoint
+> and whether the client is authorized.
+
+The Request Manager implements an LRU cache for the ETag values of the latest GitHub API URLs requested
+and sets the appropriate headers when making a request.
+If a `304 Not Modified` response is returned, the Request Manager skips publishing the response
+and immediately pulls the next request from the queue.
+
 ## Out-of-scope features
 
 The following features that would normally be considered for a project of this type

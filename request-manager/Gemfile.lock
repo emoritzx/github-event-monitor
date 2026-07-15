@@ -116,6 +116,7 @@ GEM
     loofah (2.25.1)
       crass (~> 1.0.2)
       nokogiri (>= 1.12.0)
+    lru_cache (1.0.0)
     mail (2.9.1)
       logger
       mini_mime (>= 0.1.1)
@@ -280,6 +281,7 @@ DEPENDENCIES
   brakeman
   bunny
   debug
+  lru_cache
   puma (>= 5.0)
   rails (~> 7.2.3, >= 7.2.3.1)
   rubocop-rails-omakase
