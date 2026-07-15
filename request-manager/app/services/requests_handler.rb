@@ -1,3 +1,5 @@
+require 'json'
+
 # Business logic for handling a request message
 class RequestsHandler
 
@@ -26,8 +28,13 @@ class RequestsHandler
       false
     when Net::HTTPSuccess
       topic = get_topic(message)
+      data = {
+        path: message,
+        headers: response.to_hash,
+        body: JSON.parse(response.body)
+      }
       Rails.logger.info "Publishing response to #{topic}"
-      @publisher.publish(topic, response.body)
+      @publisher.publish(topic, data.to_json)
       true
     else
       Rails.logger.error "Unhandled HTTP response #{response.code}"

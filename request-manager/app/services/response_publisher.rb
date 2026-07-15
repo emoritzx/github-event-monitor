@@ -26,7 +26,11 @@ class ResponsePublisher
     channel = connection.create_channel
     queue = channel.quorum_queue(topic)
 
-    channel.default_exchange.publish(message, routing_key: queue.name)
+    options = {
+      content_type: "application/json",
+      routing_key: queue.name
+    }
+    channel.default_exchange.publish(message, options)
     Rails.logger.info "published response message to queue #{queue.name}"
 
     connection.close
