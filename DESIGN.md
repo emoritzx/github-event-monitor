@@ -126,7 +126,7 @@ If a client saves the value of the header and sends it on a follow-on request wi
 _and_ the server determines that there is no new data since the last request,
 the server can instead return `304 Not Modified` and the request does not count against the rate limit.
 
-> :info: There may be additional factors affecting this behavior,
+> :information_source: There may be additional factors affecting this behavior,
 > including whether the endpoint is considered a conditional endpoint
 > and whether the client is authorized.
 
