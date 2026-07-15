@@ -42,8 +42,11 @@ class RequestsSubscriber
 
     queue.subscribe(manual_ack: true, block: true) do |delivery_info, _properties, body|
       Rails.logger.info "Received #{@config[:topic]} message"
-      onsubscribe.call(body)
-      sleep @sleep_amount
+      do_sleep = onsubscribe.call(body)
+      if do_sleep
+        Rails.logger.debug "Waiting #{@sleep_amount} seconds due to rate limits"
+        sleep @sleep_amount
+      end
       channel.ack(delivery_info.delivery_tag)
     end
 

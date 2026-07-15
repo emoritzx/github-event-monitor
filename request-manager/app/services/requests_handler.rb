@@ -9,11 +9,31 @@ class RequestsHandler
 
   # Given a request message, calls the GitHub API
   # and publishes the response to the appropriate topic.
+  #
+  # Returns `true` if the message was handled in a way
+  # that should cause the caller to wait before calling again.
+  #
+  # TODO: Better return values
+  # TODO: Handle error responses
+  # TODO: Do we need to worry about redirects?
   def handle(message)
+
     response = @api.request(message)
-    topic = get_topic(message)
-    Rails.logger.info "Publishing response to #{topic}"
-    @publisher.publish(topic, response.body)
+
+    case response
+    when Net::HTTPNotModified
+      Rails.logger.info "Data not modified since last request"
+      false
+    when Net::HTTPSuccess
+      topic = get_topic(message)
+      Rails.logger.info "Publishing response to #{topic}"
+      @publisher.publish(topic, response.body)
+      true
+    else
+      Rails.logger.error "Unhandled HTTP response #{response.code}"
+      Rails.logger.debug response
+      true
+    end
   end
 
   # Extracts the topic name from the original message
