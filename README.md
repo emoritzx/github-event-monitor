@@ -22,25 +22,17 @@ These services are active and listening, but will not perform any computations w
 
 ## Ingestion
 
-Start the Event Poller service to begin requesting events from the GitHub Event API:
+Start the Ingest command to begin requesting events from the GitHub Event API:
 
 ```bash
-docker compose --profile ingest run --rm poller
+docker compose --profile ingest run --rm ingest
 ```
-
-Stop the Event Poller service at any time by issuing an interrupt `CTRL-C`.
 
 ## Testing
 
 ## Verification
 
 ### Logs
-
-#### poller
-
-```log
-INFO: published message to queue requests
-```
 
 :warning: Make sure to include:
   - What logs to expect

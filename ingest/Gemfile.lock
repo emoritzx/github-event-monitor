@@ -1,0 +1,22 @@
+GEM
+  remote: https://rubygems.org/
+  specs:
+    amq-protocol (2.8.0)
+    bunny (3.1.0)
+      amq-protocol (~> 2.7)
+      logger (~> 1, >= 1.7)
+      sorted_set (~> 1, >= 1.0.2)
+    logger (1.7.0)
+    rbtree (0.4.7)
+    sorted_set (1.1.0)
+      rbtree
+
+PLATFORMS
+  ruby
+  x86_64-linux-gnu
+
+DEPENDENCIES
+  bunny
+
+BUNDLED WITH
+   2.6.7

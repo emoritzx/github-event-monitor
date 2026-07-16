@@ -53,25 +53,6 @@ services:
     profiles:
       - ingest
 
-  # Event Poller
-  poller:
-    build: ./poller
-    depends_on:
-      rabbitmq:
-        condition: service_healthy
-    env_file:
-      - ./secrets/github-api.env
-      - ./secrets/rabbitmq-credentials.env
-      - ./secrets/rails.env
-    healthcheck:
-      test: curl --fail localhost:3000/up
-      interval: 60s
-      timeout: 30s
-      retries: 3
-      start_period: 15s
-    profiles:
-      - ingest
-
   # System of record
   postgres:
     env_file:
