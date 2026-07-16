@@ -13,8 +13,8 @@ class UsersSubscriberJob < ApplicationJob
             user: ENV["RABBITMQ_DEFAULT_USER"]
         }
 
-        exchange_name = "repos"
-        elasticsearch_index = "repos"
+        exchange_name = "users"
+        elasticsearch_index = "users"
 
         elasticsearch_client = Elasticsearch::Client.new(host: ENV['ELASTICSEARCH_HOSTNAME'])
         users_subscriber = ResponseSubscriber.new(rabbitmq_config, exchange_name)

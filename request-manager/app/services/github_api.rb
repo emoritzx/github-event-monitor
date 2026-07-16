@@ -12,7 +12,8 @@ require 'lru_cache'
 class GithubApi
 
   # Constructor
-  def initialize(options, logger)
+  def initialize(options, logger, client = Net::HTTP)
+    @client = client
     @options = options
     @logger = logger
     @etag_cache = LRUCache.new(1_000)
@@ -36,7 +37,6 @@ class GithubApi
     uri = URI.parse(full_uri)
 
     @logger.info "Calling API: #{uri}"
-    request = Net::HTTP::Get.new(uri.to_s)
 
     # Set appropriate headers
     #
@@ -48,7 +48,7 @@ class GithubApi
     # you are allowed to poll, based on server load. This header is specific to the Events API.
     headers = {
       "Accept": "application/vnd.github+json",
-      "X-GitHub-Api-Version": "2026-03-10",
+      "X-GitHub-Api-Version": @options[:github_api_version],
       "User-Agent": @options[:user_agent]
     }
 
@@ -61,7 +61,7 @@ class GithubApi
         headers["If-None-Match"] = old_etag
     end
 
-    response = Net::HTTP.get_response(uri, headers)
+    response = @client.get_response(uri, headers)
 
     # Cache the new ETag, if any
     new_etag = response["ETag"]

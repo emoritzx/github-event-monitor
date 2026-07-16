@@ -30,6 +30,25 @@ docker compose --profile ingest run --rm ingest
 
 ## Testing
 
+### Unit Tests
+
+Run the projects unit tests (requires a pre-configured Ruby environment).
+
+#### Data Manager
+
+```bash
+cd data-manager
+RAILS_ENV=test ./bin/rails db:migrate
+./bin/rails test
+```
+
+#### Request Manager
+
+```bash
+cd request-manager
+rake test
+```
+
 ## Verification
 
 If the system is working, events should start being ingested immediately.

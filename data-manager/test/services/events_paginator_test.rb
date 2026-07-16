@@ -9,7 +9,7 @@ class EventsPaginatorTest < ActiveSupport::TestCase
     expected = "2"
     paginator = EventsPaginator.new
     message = JSON.parse({headers: {link: [links]}}.to_json)
-    actual = paginator.paginate(message)
+    actual, _path = paginator.paginate(message)
     assert_equal expected, actual
   end
 
@@ -18,7 +18,7 @@ class EventsPaginatorTest < ActiveSupport::TestCase
     expected = "2"
     paginator = EventsPaginator.new
     message = JSON.parse({headers: {link: [links]}}.to_json)
-    actual = paginator.paginate(message)
+    actual, _path = paginator.paginate(message)
     assert_equal expected, actual
   end
 
@@ -30,7 +30,7 @@ class EventsPaginatorTest < ActiveSupport::TestCase
     expected = "4"
     paginator = EventsPaginator.new
     message = JSON.parse({headers: {link: [links]}}.to_json)
-    actual = paginator.paginate(message)
+    actual, _path = paginator.paginate(message)
     assert_equal expected, actual
   end
 
@@ -40,8 +40,25 @@ class EventsPaginatorTest < ActiveSupport::TestCase
         "<http://abc.com/blah?page=4>; rel=\"last\""
     paginator = EventsPaginator.new
     message = JSON.parse({headers: {link: [links]}}.to_json)
-    actual = paginator.paginate(message)
+    actual, _path = paginator.paginate(message)
     assert_nil actual
   end
 
+  test "generate link" do
+    links = "<http://abc.com/blah?page=4&per_page=23>; rel=\"next\""
+    expected = "/events?page=4&per_page=23"
+    paginator = EventsPaginator.new
+    message = JSON.parse({headers: {link: [links]}}.to_json)
+    _page_number, actual = paginator.paginate(message)
+    assert_equal expected, actual
+  end
+
+  test "generate link w/out page size" do
+    links = "<http://abc.com/blah?page=4>; rel=\"next\""
+    expected = "/events?page=4"
+    paginator = EventsPaginator.new
+    message = JSON.parse({headers: {link: [links]}}.to_json)
+    _page_number, actual = paginator.paginate(message)
+    assert_equal expected, actual
+  end
 end
