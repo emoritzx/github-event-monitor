@@ -6,8 +6,13 @@ GEM
       amq-protocol (~> 2.7)
       logger (~> 1, >= 1.7)
       sorted_set (~> 1, >= 1.0.2)
+    drb (2.2.3)
     logger (1.7.0)
     lru_cache (1.0.0)
+    minitest (6.0.6)
+      drb (~> 2.0)
+      prism (~> 1.5)
+    prism (1.9.0)
     rbtree (0.4.7)
     sorted_set (1.1.0)
       rbtree
@@ -19,6 +24,7 @@ PLATFORMS
 DEPENDENCIES
   bunny
   lru_cache
+  minitest
 
 BUNDLED WITH
    2.6.7

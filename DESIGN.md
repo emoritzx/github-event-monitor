@@ -146,7 +146,6 @@ will not be included in this demonstration due to time or resource constraints:
 - user interface
 - start/stop endpoints for service processing
 - hardening Rails applications for production
-- RabbitMQ configuration (demo uses default exchange)
 - performance monitoring and tuning
 - coding standards checking, code quality scanning, linting
 - undeliverable messages (DLX queue)

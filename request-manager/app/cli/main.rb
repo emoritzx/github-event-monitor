@@ -31,6 +31,7 @@ def main
 
     github_options = {
         domain: ENV["GITHUB_API_DOMAIN"],
+        github_api_version: ENV["GITHUB_API_VERSION"],
         port: ENV["GITHUB_API_PORT"],
         scheme: ENV["GITHUB_API_SCHEME"],
         user_agent: ENV["GITHUB_API_USER_AGENT"]

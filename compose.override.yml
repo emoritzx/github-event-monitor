@@ -17,7 +17,6 @@ services:
     image: curlimages/curl:8.21.0
     profiles:
       - debug
-
   # Override production log level
   # data-manager:
   #   environment:
@@ -27,3 +26,8 @@ services:
   # rabbitmq:
   #   ports:
   #     - 15672:15672
+
+  # Override log level
+  # request-manager:
+  #   environment:
+  #     LOG_LEVEL: debug
