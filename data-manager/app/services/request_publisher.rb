@@ -4,13 +4,10 @@ class RequestPublisher
   attr_accessor :config
 
   # Constructor
-  def initialize
-    @config = {
-      exchange: "requests",
-      host: ENV["RABBITMQ_HOST"],
-      password: ENV["RABBITMQ_DEFAULT_PASS"],
-      user: ENV["RABBITMQ_DEFAULT_USER"]
-    }
+  def initialize(config, exchange, logger = Rails.logger)
+    @config = config
+    @exchange_name = exchange
+    @logger = logger
   end
 
   # Publish the request
@@ -25,14 +22,14 @@ class RequestPublisher
     connection.start
 
     channel = connection.create_channel
-    exchange = channel.fanout(@config[:exchange])
+    exchange = channel.fanout(@exchange_name)
 
     options = {
       content_type: "text/plain"
     }
 
     exchange.publish(message, options)
-    Rails.logger.info "Published request: #{message}"
+    @logger.info "Published to #{@exchange_name}: #{message}"
 
     connection.close
   end

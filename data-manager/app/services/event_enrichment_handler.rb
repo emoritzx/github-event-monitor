@@ -2,13 +2,14 @@
 class EventEnrichmentHandler
 
     # Constructor
-    def initialize(request_publisher)
+    def initialize(request_publisher, logger = Rails.logger)
         @publisher = request_publisher
+        @logger = logger
     end
 
     # Request additional data for the event
     def handle(event)
-        Rails.logger.debug "Enriching event #{event["id"]}"
+        @logger.debug "Enriching event #{event["id"]}"
         enrich(event, "actor", "url")
         enrich(event, "repo", "url")
     end
@@ -27,7 +28,7 @@ class EventEnrichmentHandler
                 rescue URI::InvalidURIError
                     # TODO: figure out how to parse URLs with square brackets
                     # Example: /users/github-actions[bot]
-                    Rails.logger.error "Could not parse URL: #{url_field}"
+                    @logger.error "Could not parse URL: #{url_field}"
                 end
             end
         end

@@ -1,7 +1,11 @@
 class EventStructuredHandler
 
+    def initialize(logger = Rails.logger)
+        @logger = logger
+    end
+
     def handle(event)
-        Rails.logger.debug "Storing structured event data for event #{event["id"]}"
+        @logger.debug "Storing structured event data for event #{event["id"]}"
         # TODO: handle duplicates
         payload = event["payload"]
         event_model = Event.new do |e|
