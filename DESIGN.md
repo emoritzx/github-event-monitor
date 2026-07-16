@@ -150,7 +150,32 @@ will not be included in this demonstration due to time or resource constraints:
 - coding standards checking, code quality scanning, linting
 - undeliverable messages (DLX queue)
 - Elasticsearch index templates
+- message observability
 
 The following features were intended to be included but could not due to time or resource constraints:
 
-- TBD
+- **Failed message handling:** currently they are dropped forever
+- **Dynamic rate limiting:** currently the request manager polls on a fixed interval. However, the response headers contain enough information to change how long to wait before making the next call.
+- **Mocking the GitHub API:** the design architecture allows for swapping out the Proxy service with another URL or even a new service that returns mocked data. The intent was to provide JSON files containing various scenarios to exercise the system.
+
+The Backlog column of the [GitHub Project](https://github.com/users/emoritzx/projects/1/views/1) contains issues that were created but not completed (or only partially completed).
+
+The following `TODO:` statements were left in the code at the time of submission:
+
+```bash
+find -type f -print0 | xargs -0 grep 'TODO:' | grep -v '.git' | grep -v 'DESIGN.md' | tr -s ' '
+```
+
+```text
+./request-manager/app/services/requests_handler.rb:19: # TODO: Better return values
+./request-manager/app/services/requests_handler.rb:20: # TODO: Handle error responses
+./request-manager/app/services/requests_handler.rb:21: # TODO: Handle getting rate limited
+./request-manager/app/services/requests_handler.rb:22: # TODO: Do we need to worry about redirects?
+./data-manager/app/services/event_structured_handler.rb:9: # TODO: handle duplicates
+./data-manager/app/services/events_paginator.rb:7: # TODO: There's gotta be a better way to parse this
+./data-manager/app/services/event_enrichment_handler.rb:29: # TODO: figure out how to parse URLs with square brackets
+./data-manager/app/services/event_raw_handler.rb:11: # TODO: change to use bulk API
+./data-manager/app/services/event_raw_handler.rb:12: # TODO: handle duplicates
+./data-manager/app/jobs/events_subscriber_job.rb:43: # TODO: Refactor this to use routing keys
+./data-manager/test/services/events_paginator_test.rb:4:# TODO: Figure out if minitest supports data providers for multiple test cases
+```
