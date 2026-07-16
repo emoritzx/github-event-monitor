@@ -150,6 +150,7 @@ will not be included in this demonstration due to time or resource constraints:
 - performance monitoring and tuning
 - coding standards checking, code quality scanning, linting
 - undeliverable messages (DLX queue)
+- Elasticsearch index templates
 
 The following features were intended to be included but could not due to time or resource constraints:
 
