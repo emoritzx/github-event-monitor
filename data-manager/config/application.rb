@@ -32,7 +32,6 @@ module DataManager
     # Enqueue the startup jobs
     config.after_initialize do
       EventsSubscriberJob.perform_later
-      UsersSubscriberJob.perform_later
     end
   end
 end

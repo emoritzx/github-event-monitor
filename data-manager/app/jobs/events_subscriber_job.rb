@@ -4,7 +4,7 @@ require 'elasticsearch'
 class EventsSubscriberJob < ApplicationJob
     queue_as :default
 
-    # Subscribes to the events exchange
+    # Subscribes to the events queue
     # - persists raw event data
     # - persists structured event data
     # - detects pagination
@@ -14,10 +14,9 @@ class EventsSubscriberJob < ApplicationJob
         elasticsearch_client = Elasticsearch::Client.new(host: ENV['ELASTICSEARCH_HOSTNAME'])
         event_raw_handler = EventRawHandler.new(elasticsearch_client)
         event_structured_handler = EventStructuredHandler.new
-        events_subscriber = ResponseSubscriber.new("events")
+        events_subscriber = EventsSubscriber.new
         paginator = EventsPaginator.new
-        request_publisher = RequestPublisher.new
-        event_enrichment_handler = EventEnrichmentHandler.new(request_publisher)
+        requests_publisher = RequestPublisher.new
 
         logger.info "Listening for events"
         events_subscriber.subscribe(lambda { |message|
@@ -29,14 +28,13 @@ class EventsSubscriberJob < ApplicationJob
             next_page, path = paginator.paginate(message)
             if next_page && path
                 logger.info "Requesting next event page (#{next_page})"
-                request_publisher.publish(path)
+                requests_publisher.publish(path)
             end
 
             for event in events
                 if event["type"] == "PushEvent"
                     event_raw_handler.handle(event)
                     event_structured_handler.handle(event)
-                    event_enrichment_handler.handle(event)
                 else
                     logger.debug "Skipping event #{event["id"]} of type #{event["type"]}"
                 end

@@ -32,7 +32,7 @@ class RequestPublisher
     }
 
     exchange.publish(message, options)
-    Rails.logger.info "Published request: #{message}"
+    Rails.logger.info "published message to exchange #{@config[:exchange]}"
 
     connection.close
   end

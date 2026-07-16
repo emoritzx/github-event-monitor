@@ -1,25 +1,25 @@
 require 'json'
 
-# Subscribes to GitHub API responses
-class ResponseSubscriber
+# Subscribes to events
+class EventsSubscriber
 
   attr_accessor :config
 
   # Constructor
-  def initialize(exchange_name)
+  def initialize
     @config = {
+      exchange: "events",
       host: ENV["RABBITMQ_HOST"],
       password: ENV["RABBITMQ_DEFAULT_PASS"],
+      queue: "data_manager",
       user: ENV["RABBITMQ_DEFAULT_USER"]
     }
-    @exchange_name = exchange_name
-    @queue_name = "#{exchange_name}_data_manager}"
+    @queue_name = "#{@config[:exchange]}_#{@config[:queue]}"
   end
 
-  # Subscribe to responses on the configured exchange,
-  # calling :onsubscribe when a message is received
+  # Subscribe to events, calling :onsubscribe when a message is received
   #
-  # Response data is assumed to be `application/json`
+  # Event data is assumed to be `application/json`
   def subscribe(onsubscribe)
 
     connection = Bunny.new(
@@ -31,13 +31,13 @@ class ResponseSubscriber
     connection.start
 
     channel = connection.create_channel
-    exchange = channel.fanout(@exchange_name)
+    exchange = channel.fanout(@config[:exchange])
     queue = channel.quorum_queue(@queue_name).bind(exchange)
 
-    Rails.logger.info "Waiting for #{@exchange_name} messages"
+    Rails.logger.info "Waiting for #{@config[:exchange]} messages"
 
     queue.subscribe(manual_ack: true, block: true) do |delivery_info, _properties, body|
-      Rails.logger.debug "Received #{@exchange_name} message"
+      Rails.logger.info "Received #{@config[:exchange]} message"
       data = JSON.parse(body)
       onsubscribe.call(data)
       channel.ack(delivery_info.delivery_tag)
