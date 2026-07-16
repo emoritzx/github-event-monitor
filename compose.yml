@@ -2,14 +2,56 @@ name: github-event-monitor
 
 services:
 
+  # Data Manager
+  data-manager:
+    build: ./data-manager
+    depends_on:
+      elasticsearch:
+        condition: service_healthy
+      postgres:
+        condition: service_healthy
+      rabbitmq:
+        condition: service_healthy
+    env_file:
+      - ./secrets/github-api.env
+      - ./secrets/postgres.env
+      - ./secrets/rabbitmq-credentials.env
+      - ./secrets/rails.env
+    environment:
+      POSTGRES_HOSTNAME: postgres
+    healthcheck:
+      test: curl --fail localhost:3000/up
+      interval: 60s
+      timeout: 30s
+      retries: 3
+      start_period: 15s
+
   # Object Storage
   elasticsearch:
     environment:
       discovery.type: single-node
       xpack.security.enabled: "false"
+    healthcheck:
+      test: curl --fail localhost:9200
+      interval: 60s
+      timeout: 30s
+      retries: 3
+      start_period: 15s
     image: elasticsearch:9.4.3
     volumes:
       - elasticsearch:/usr/share/elasticsearch/data:rw
+
+  # Ingestion
+  ingest:
+    build: ./ingest
+    depends_on:
+      rabbitmq:
+        condition: service_healthy
+    env_file:
+      - ./secrets/github-api.env
+      - ./secrets/rabbitmq-credentials.env
+    profiles:
+      - ingest
 
   # Event Poller
   poller:
@@ -32,12 +74,16 @@ services:
 
   # System of record
   postgres:
-    environment:
-      POSTGRES_PASSWORD_FILE: /run/secrets/postgres-password
+    env_file:
+      - ./secrets/postgres.env
+    healthcheck:
+      test: pg_isready
+      interval: 60s
+      timeout: 30s
+      retries: 3
+      start_period: 15s
     image: postgres:18.4-alpine3.24
     restart: always
-    secrets:
-      - postgres-password
     volumes:
       - postgres:/var/lib/postgresql:rw
 
@@ -58,7 +104,6 @@ services:
   # Message Broker
   rabbitmq:
     env_file:
-      # rabbitmq image doesn't use RABBITMQ_DEFAULT_PASS_FILE since 3.9
       - ./secrets/rabbitmq-credentials.env
     healthcheck:
       test: rabbitmq-diagnostics --quiet check_running && rabbitmq-diagnostics --quiet check_local_alarms
@@ -93,10 +138,6 @@ services:
       timeout: 30s
       retries: 3
       start_period: 15s
-
-secrets:
-  postgres-password:
-    file: ./secrets/postgres-password.txt
 
 volumes:
   elasticsearch:

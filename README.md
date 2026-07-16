@@ -52,7 +52,7 @@ INFO: published message to queue requests
 Tear down the Compose project and delete all data:
 
 ```bash
-docker compose down --volumes
+docker compose down --volumes --remove-orphans
 ```
 
 Add the `--rmi local` or `--rmi all` flag to delete downloaded container images as well.

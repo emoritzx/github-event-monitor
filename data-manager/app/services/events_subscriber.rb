@@ -1,31 +1,25 @@
-# Subscribes to requests
-class RequestsSubscriber
+require 'json'
 
-  attr_accessor :config, :requests_per_minute
+# Subscribes to events
+class EventsSubscriber
+
+  attr_accessor :config
 
   # Constructor
-  def initialize(requests_per_minute)
+  def initialize
     @config = {
-      exchange: "requests",
+      exchange: "events",
       host: ENV["RABBITMQ_HOST"],
       password: ENV["RABBITMQ_DEFAULT_PASS"],
-      queue: "request_manager",
+      queue: "data_manager",
       user: ENV["RABBITMQ_DEFAULT_USER"]
     }
-    @requests_per_minute = requests_per_minute
-    @sleep_amount = 60 / requests_per_minute
     @queue_name = "#{@config[:exchange]}_#{@config[:queue]}"
   end
 
-  # Subscribe to requests
+  # Subscribe to events, calling :onsubscribe when a message is received
   #
-  # A single request is processed at a time,
-  # which allows the subscribe loop to abide by the rate limit
-  # by sleeping (see :requests_per_minute).
-  #
-  # Calls the provided onsubscribe method when a message is received.
-  # The message is not ACK'd until the onsubscribe method succeeds
-  # and the sleep timer has completed.
+  # Event data is assumed to be `application/json`
   def subscribe(onsubscribe)
 
     connection = Bunny.new(
@@ -37,8 +31,6 @@ class RequestsSubscriber
     connection.start
 
     channel = connection.create_channel
-    channel.prefetch(1)
-
     exchange = channel.fanout(@config[:exchange])
     queue = channel.quorum_queue(@queue_name).bind(exchange)
 
@@ -46,11 +38,8 @@ class RequestsSubscriber
 
     queue.subscribe(manual_ack: true, block: true) do |delivery_info, _properties, body|
       Rails.logger.info "Received #{@config[:exchange]} message"
-      do_sleep = onsubscribe.call(body)
-      if do_sleep
-        Rails.logger.debug "Waiting #{@sleep_amount} seconds due to rate limits"
-        sleep @sleep_amount
-      end
+      data = JSON.parse(body)
+      onsubscribe.call(data)
       channel.ack(delivery_info.delivery_tag)
     end
 

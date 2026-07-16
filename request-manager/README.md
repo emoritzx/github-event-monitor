@@ -18,7 +18,7 @@ This Ruby on Rails application was generated via the following command:
 rails new request-manager --api --skip-active-record
 ```
 
-SSL was disabled via `application.rb`:
+SSL was disabled via `production.rb`:
 
 ```ruby
 config.force_ssl = false
