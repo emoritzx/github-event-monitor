@@ -32,6 +32,23 @@ docker compose --profile ingest run --rm ingest
 
 ## Verification
 
+### Database
+
+```bash
+docker compose exec postgres psql -U postgres
+# in the psql CLI
+\c data_manager_production
+select * from events;
+```
+
+### Object store
+
+```bash
+docker compose exec elasticsearch curl http://localhost:9200/events/_search
+docker compose exec elasticsearch curl http://localhost:9200/actors/_search
+docker compose exec elasticsearch curl http://localhost:9200/repos/_search
+```
+
 ### Logs
 
 :warning: Make sure to include:

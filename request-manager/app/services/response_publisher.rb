@@ -31,7 +31,7 @@ class ResponsePublisher
     }
 
     exchange.publish(message, options)
-    Rails.logger.info "published response message to exchange #{exchange_name}"
+    puts "Published response message to exchange #{exchange_name}"
 
     connection.close
   end
