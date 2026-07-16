@@ -47,11 +47,11 @@ class RequestsSubscriber
     queue.subscribe(manual_ack: true, block: true) do |delivery_info, _properties, body|
       puts "Received #{@config[:exchange]} message"
       do_sleep = onsubscribe.call(body)
+      channel.ack(delivery_info.delivery_tag)
       if do_sleep
         puts "Waiting #{@sleep_amount} seconds due to rate limits"
         sleep @sleep_amount
       end
-      channel.ack(delivery_info.delivery_tag)
     end
 
     connection.close

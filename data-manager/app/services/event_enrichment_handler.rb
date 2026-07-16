@@ -8,13 +8,14 @@ class EventEnrichmentHandler
 
     # Request additional data for the event
     def handle(event)
+        Rails.logger.debug "Enriching event #{event["id"]}"
         enrich(event, "actor", "url")
+        enrich(event, "repo", "url")
     end
 
     # Extract the URL from a specific field of the event
     # and publish a follow-on request to the GitHub API
     def enrich(event, top_field_name, url_field_name)
-        Rails.logger.debug "Enriching event #{event["id"]}"
         top_field = event[top_field_name]
         if top_field
             url_field = top_field[url_field_name]
@@ -24,6 +25,8 @@ class EventEnrichmentHandler
                     path = uri.path
                     @publisher.publish(path)
                 rescue URI::InvalidURIError
+                    # TODO: figure out how to parse URLs with square brackets
+                    # Example: /users/github-actions[bot]
                     Rails.logger.error "Could not parse URL: #{url_field}"
                 end
             end

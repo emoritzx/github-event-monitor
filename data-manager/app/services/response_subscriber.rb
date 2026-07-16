@@ -13,7 +13,7 @@ class ResponseSubscriber
       user: ENV["RABBITMQ_DEFAULT_USER"]
     }
     @exchange_name = exchange_name
-    @queue_name = "#{exchange_name}_data_manager}"
+    @queue_name = "#{exchange_name}_data_manager"
   end
 
   # Subscribe to responses on the configured exchange,
