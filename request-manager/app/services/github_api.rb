@@ -1,6 +1,5 @@
 require 'net/http'
 require 'lru_cache'
-# require 'lru_cache/thread_safe'
 
 # Service client for calling the GitHub API
 #
@@ -13,10 +12,9 @@ require 'lru_cache'
 class GithubApi
 
   # Constructor
-  def initialize(options)
+  def initialize(options, logger)
     @options = options
-    # TODO: Figure out why ThreadSafe version not working
-    # @etag_cache = LRUCache::ThreadSafe.new(1_000)
+    @logger = logger
     @etag_cache = LRUCache.new(1_000)
   end
 
@@ -37,7 +35,7 @@ class GithubApi
     full_uri = "#{base_url}#{path}"
     uri = URI.parse(full_uri)
 
-    puts "Calling API: #{uri}"
+    @logger.info "Calling API: #{uri}"
     request = Net::HTTP::Get.new(uri.to_s)
 
     # Set appropriate headers
@@ -59,7 +57,7 @@ class GithubApi
     # and your current rate limit will be untouched.
     old_etag = @etag_cache[path]
     if old_etag
-        puts "Cached ETag #{old_etag} found for path #{path}"
+        @logger.debug "Cached ETag #{old_etag} found for path #{path}"
         headers["If-None-Match"] = old_etag
     end
 
@@ -69,11 +67,14 @@ class GithubApi
     new_etag = response["ETag"]
     if new_etag
       @etag_cache[path] = new_etag
-      puts "ETag #{new_etag} cached for path #{path}"
+      @logger.debug "ETag #{new_etag} cached for path #{path}"
     end
 
-    puts "Response code: #{response.code}"
-    puts "Rate limit remaining: #{response['x-ratelimit-remaining']}"
+    @logger.info "Response code: #{response.code}"
+
+    # Normally, I would log this as DEBUG, but it is important to the task
+    # to verify that the system is abiding by the rate limit
+    @logger.warn "Rate limit remaining: #{response['x-ratelimit-remaining']}"
 
     response
   end

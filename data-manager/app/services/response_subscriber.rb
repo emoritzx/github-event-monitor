@@ -6,13 +6,10 @@ class ResponseSubscriber
   attr_accessor :config
 
   # Constructor
-  def initialize(exchange_name)
-    @config = {
-      host: ENV["RABBITMQ_HOST"],
-      password: ENV["RABBITMQ_DEFAULT_PASS"],
-      user: ENV["RABBITMQ_DEFAULT_USER"]
-    }
+  def initialize(config, exchange_name, logger = Rails.logger)
+    @config = config
     @exchange_name = exchange_name
+    @logger = logger
     @queue_name = "#{exchange_name}_data_manager"
   end
 
@@ -21,6 +18,8 @@ class ResponseSubscriber
   #
   # Response data is assumed to be `application/json`
   def subscribe(onsubscribe)
+
+    @logger.debug "Connecting to #{@exchange_name} exchange"
 
     connection = Bunny.new(
       :host => @config[:host],
@@ -34,10 +33,10 @@ class ResponseSubscriber
     exchange = channel.fanout(@exchange_name)
     queue = channel.quorum_queue(@queue_name).bind(exchange)
 
-    Rails.logger.info "Waiting for #{@exchange_name} messages"
+    @logger.info "Listening for #{@exchange_name}..."
 
     queue.subscribe(manual_ack: true, block: true) do |delivery_info, _properties, body|
-      Rails.logger.debug "Received #{@exchange_name} message"
+      @logger.debug "Received #{@exchange_name} message"
       data = JSON.parse(body)
       onsubscribe.call(data)
       channel.ack(delivery_info.delivery_tag)

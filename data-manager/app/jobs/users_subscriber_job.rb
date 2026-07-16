@@ -7,11 +7,18 @@ class UsersSubscriberJob < ApplicationJob
     # Subscribes to the users exchange
     def perform()
 
-        elasticsearch_client = Elasticsearch::Client.new(host: ENV['ELASTICSEARCH_HOSTNAME'])
-        users_subscriber = ResponseSubscriber.new("users")
-        index = "users"
+        rabbitmq_config = {
+            host: ENV["RABBITMQ_HOST"],
+            password: ENV["RABBITMQ_DEFAULT_PASS"],
+            user: ENV["RABBITMQ_DEFAULT_USER"]
+        }
 
-        logger.info "Listening for users"
+        exchange_name = "repos"
+        elasticsearch_index = "repos"
+
+        elasticsearch_client = Elasticsearch::Client.new(host: ENV['ELASTICSEARCH_HOSTNAME'])
+        users_subscriber = ResponseSubscriber.new(rabbitmq_config, exchange_name)
+
         users_subscriber.subscribe(lambda { |message|
 
             user = message["body"]
@@ -20,7 +27,7 @@ class UsersSubscriberJob < ApplicationJob
 
             logger.info "Received user #{user_name} (#{user_id})"
 
-            elasticsearch_client.index(index: index, id: user_id, body: user)
+            elasticsearch_client.index(index: elasticsearch_index, id: user_id, body: user)
         })
     end
 end

@@ -1,18 +1,20 @@
 #!/usr/bin/env ruby
 
+require 'logger'
 require 'bunny'
 
 def main
-    publish_initial_request
-end
 
-# Publishes the initial event request to the message broker
-def publish_initial_request
+    $stdout.sync = true
+    log_level = ENV.fetch("LOG_LEVEL", "info")
+    logger = Logger.new($stdout, level: log_level)
+    logger.progname = "ingest"
 
     exchange_name = "requests"
-    message = "/events"
+    page_size = ENV.fetch("GITHUB_API_PAGE_SIZE", "100")
+    message = "/events?page=1&per_page=#{page_size}"
 
-    puts "Creating RabbitMQ connection..."
+    logger.info "Creating RabbitMQ connection..."
 
     connection = Bunny.new(
         :host => ENV["RABBITMQ_HOST"],
@@ -29,15 +31,16 @@ def publish_initial_request
         content_type: "text/plain"
     }
 
-    puts "Publishing initial event request..."
+    logger.info "Publishing initial event request..."
 
     exchange.publish(message, options)
 
-    puts "Published message to exchange: #{exchange_name}"
+    logger.info "Published to #{exchange_name} exchange: #{message}"
 
     connection.close
 
-    puts "Done."
+    logger.info "Done."
+    logger.close
 end
 
 main if __FILE__ == $PROGRAM_NAME

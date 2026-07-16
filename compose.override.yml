@@ -5,7 +5,7 @@
 # and can be different per user.
 #
 # However, I wanted to show part of the thought process
-# for doing development.
+# for doing debugging during development.
 
 services:
 
@@ -19,16 +19,11 @@ services:
       - debug
 
   # Override production log level
-  data-manager:
-    environment:
-      RAILS_LOG_LEVEL: debug
+  # data-manager:
+  #   environment:
+  #     RAILS_LOG_LEVEL: debug
 
   # Expose management port
-  rabbitmq:
-    ports:
-      - 15672:15672
-
-  # Override production log level
-  request-manager:
-    environment:
-      RAILS_LOG_LEVEL: debug
+  # rabbitmq:
+  #   ports:
+  #     - 15672:15672

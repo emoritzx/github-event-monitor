@@ -4,12 +4,9 @@ class ResponsePublisher
   attr_accessor :config
 
   # Constructor
-  def initialize
-    @config = {
-      host: ENV["RABBITMQ_HOST"],
-      password: ENV["RABBITMQ_DEFAULT_PASS"],
-      user: ENV["RABBITMQ_DEFAULT_USER"]
-    }
+  def initialize(config, logger)
+    @config = config
+    @logger = logger
   end
 
   # Publish the response message to the given exchange
@@ -31,7 +28,7 @@ class ResponsePublisher
     }
 
     exchange.publish(message, options)
-    puts "Published response message to exchange #{exchange_name}"
+    @logger.info "Published response message to exchange #{exchange_name}"
 
     connection.close
   end

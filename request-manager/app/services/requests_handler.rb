@@ -4,8 +4,9 @@ require 'json'
 class RequestsHandler
 
   # Constructor
-  def initialize(api, publisher)
+  def initialize(api, publisher, logger)
     @api = api
+    @logger = logger
     @publisher = publisher
   end
 
@@ -17,6 +18,7 @@ class RequestsHandler
   #
   # TODO: Better return values
   # TODO: Handle error responses
+  # TODO: Handle getting rate limited
   # TODO: Do we need to worry about redirects?
   def handle(message)
 
@@ -24,7 +26,7 @@ class RequestsHandler
 
     case response
     when Net::HTTPNotModified
-      puts "Data not modified since last request"
+      @logger.info "Data not modified since last request"
       false
     when Net::HTTPSuccess
       exchange = get_exchange(message)
@@ -33,12 +35,12 @@ class RequestsHandler
         headers: response.to_hash,
         body: JSON.parse(response.body)
       }
-      puts "Publishing response to #{exchange}"
+      @logger.info "Publishing response to #{exchange}"
       @publisher.publish(exchange, data.to_json)
       true
     else
-      puts "Unhandled HTTP response #{response.code}"
-      puts response
+      @logger.warn "Unhandled HTTP response #{response.code}"
+      @logger.debug response
       true
     end
   end

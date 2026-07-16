@@ -11,15 +11,22 @@ class EventsSubscriberJob < ApplicationJob
     # - publishes event request for the next page
     def perform()
 
+        rabbitmq_config = {
+            host: ENV["RABBITMQ_HOST"],
+            password: ENV["RABBITMQ_DEFAULT_PASS"],
+            user: ENV["RABBITMQ_DEFAULT_USER"]
+        }
+
+        events_subscriber = ResponseSubscriber.new(rabbitmq_config, "events")
+        request_publisher = RequestPublisher.new(rabbitmq_config, "requests")
+
         elasticsearch_client = Elasticsearch::Client.new(host: ENV['ELASTICSEARCH_HOSTNAME'])
         event_raw_handler = EventRawHandler.new(elasticsearch_client)
-        event_structured_handler = EventStructuredHandler.new
-        events_subscriber = ResponseSubscriber.new("events")
-        paginator = EventsPaginator.new
-        request_publisher = RequestPublisher.new
-        event_enrichment_handler = EventEnrichmentHandler.new(request_publisher)
 
-        logger.info "Listening for events"
+        event_structured_handler = EventStructuredHandler.new
+        event_enrichment_handler = EventEnrichmentHandler.new(request_publisher)
+        paginator = EventsPaginator.new
+
         events_subscriber.subscribe(lambda { |message|
 
             events = message["body"]
@@ -33,6 +40,7 @@ class EventsSubscriberJob < ApplicationJob
             end
 
             for event in events
+                # TODO: Refactor this to use routing keys
                 if event["type"] == "PushEvent"
                     event_raw_handler.handle(event)
                     event_structured_handler.handle(event)

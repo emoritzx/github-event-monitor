@@ -29,6 +29,10 @@ module DataManager
     # Skip views, helpers and assets when generating a new resource.
     config.api_only = true
 
+    # Prevent health checks from clogging up the logs.
+    # This is only available in Rails 8+
+    #config.silence_healthcheck_path = "/up"
+
     # Enqueue the startup jobs
     config.after_initialize do
       EventsSubscriberJob.perform_later
