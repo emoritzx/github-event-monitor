@@ -7,7 +7,6 @@ GEM
       logger (~> 1, >= 1.7)
       sorted_set (~> 1, >= 1.0.2)
     logger (1.7.0)
-    lru_cache (1.0.0)
     rbtree (0.4.7)
     sorted_set (1.1.0)
       rbtree
@@ -18,7 +17,6 @@ PLATFORMS
 
 DEPENDENCIES
   bunny
-  lru_cache
 
 BUNDLED WITH
    2.6.7

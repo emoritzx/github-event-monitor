@@ -1,0 +1,17 @@
+# Read about fixtures at https://api.rubyonrails.org/classes/ActiveRecord/FixtureSet.html
+
+one:
+  event_id:
+  repository_id:
+  push_id:
+  ref: MyString
+  head: MyString
+  before: MyString
+
+two:
+  event_id:
+  repository_id:
+  push_id:
+  ref: MyString
+  head: MyString
+  before: MyString

@@ -40,9 +40,9 @@ To address these considerations, the proposed architecture is a decoupled, modul
 
 The system is composed of four main services:
 - **Request Manager:** Controls how frequently requests get sent to the GitHub API. Subscribes to requests and publishes response data to the appropriate topic.
-- **Poller:** Periodically submits requests to get events from GitHub. Paginates the events response.
 - **Proxy:** Acts as a façade to the GitHub API. Allows for changing the URL to a different API or even return mock data instead of making a call.
 - **Data Manager:** Responsible for persisting data locally and making requests for enriching event data with additional information.
+- **Ingest:** Submits the initial request to get events from GitHub.
 
 ```mermaid
 ---
@@ -53,7 +53,7 @@ config:
 graph TD
 
     trigger>Start ingest]
-    poller([Poller])
+    ingest([Ingest])
     manager([Request<br>Manager])
     broker((Message<br>Broker))
 
@@ -64,10 +64,9 @@ graph TD
     DB[(DB)]
     store[(Object<br>store)]
 
-    %% poller
-    trigger --> poller
-    poller --> |publish: request events| broker
-    broker -.-> |"subscribe: events<br>(for pagination)"| poller
+    %% ingest
+    trigger --> ingest
+    ingest --> |publish: request events| broker
 
     %% manager
     broker -.-> |subscribe: requests| manager

@@ -24,7 +24,7 @@ class RequestsHandler
 
     case response
     when Net::HTTPNotModified
-      Rails.logger.info "Data not modified since last request"
+      puts "Data not modified since last request"
       false
     when Net::HTTPSuccess
       exchange = get_exchange(message)
@@ -33,12 +33,12 @@ class RequestsHandler
         headers: response.to_hash,
         body: JSON.parse(response.body)
       }
-      Rails.logger.info "Publishing response to #{exchange}"
+      puts "Publishing response to #{exchange}"
       @publisher.publish(exchange, data.to_json)
       true
     else
-      Rails.logger.error "Unhandled HTTP response #{response.code}"
-      Rails.logger.debug response
+      puts "Unhandled HTTP response #{response.code}"
+      puts response
       true
     end
   end

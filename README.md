@@ -22,25 +22,34 @@ These services are active and listening, but will not perform any computations w
 
 ## Ingestion
 
-Start the Event Poller service to begin requesting events from the GitHub Event API:
+Start the Ingest command to begin requesting events from the GitHub Event API:
 
 ```bash
-docker compose --profile ingest run --rm poller
+docker compose --profile ingest run --rm ingest
 ```
-
-Stop the Event Poller service at any time by issuing an interrupt `CTRL-C`.
 
 ## Testing
 
 ## Verification
 
-### Logs
+### Database
 
-#### poller
-
-```log
-INFO: published message to queue requests
+```bash
+docker compose exec postgres psql -U postgres
+# in the psql CLI
+\c data_manager_production
+select * from events;
 ```
+
+### Object store
+
+```bash
+docker compose exec elasticsearch curl http://localhost:9200/events/_search
+docker compose exec elasticsearch curl http://localhost:9200/actors/_search
+docker compose exec elasticsearch curl http://localhost:9200/repos/_search
+```
+
+### Logs
 
 :warning: Make sure to include:
   - What logs to expect
@@ -52,7 +61,7 @@ INFO: published message to queue requests
 Tear down the Compose project and delete all data:
 
 ```bash
-docker compose down --volumes
+docker compose down --volumes --remove-orphans
 ```
 
 Add the `--rmi local` or `--rmi all` flag to delete downloaded container images as well.

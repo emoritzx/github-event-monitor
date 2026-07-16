@@ -1,19 +1,20 @@
-# Publishes responses to the message broker
-class ResponsePublisher
+# Publishes GitHub API requests to the message broker
+class RequestPublisher
 
   attr_accessor :config
 
   # Constructor
   def initialize
     @config = {
+      exchange: "requests",
       host: ENV["RABBITMQ_HOST"],
       password: ENV["RABBITMQ_DEFAULT_PASS"],
       user: ENV["RABBITMQ_DEFAULT_USER"]
     }
   end
 
-  # Publish the response message to the given exchange
-  def publish(exchange_name, message)
+  # Publish the request
+  def publish(message)
 
     connection = Bunny.new(
       :host => @config[:host],
@@ -24,14 +25,14 @@ class ResponsePublisher
     connection.start
 
     channel = connection.create_channel
-    exchange = channel.fanout(exchange_name)
+    exchange = channel.fanout(@config[:exchange])
 
     options = {
-      content_type: "application/json"
+      content_type: "text/plain"
     }
 
     exchange.publish(message, options)
-    puts "Published response message to exchange #{exchange_name}"
+    Rails.logger.info "published message to exchange #{@config[:exchange]}"
 
     connection.close
   end

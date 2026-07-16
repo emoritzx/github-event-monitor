@@ -37,7 +37,7 @@ class GithubApi
     full_uri = "#{base_url}#{path}"
     uri = URI.parse(full_uri)
 
-    Rails.logger.info "Calling API: #{uri}"
+    puts "Calling API: #{uri}"
     request = Net::HTTP::Get.new(uri.to_s)
 
     # Set appropriate headers
@@ -59,7 +59,7 @@ class GithubApi
     # and your current rate limit will be untouched.
     old_etag = @etag_cache[path]
     if old_etag
-        Rails.logger.debug "Cached ETag #{old_etag} found for path #{path}"
+        puts "Cached ETag #{old_etag} found for path #{path}"
         headers["If-None-Match"] = old_etag
     end
 
@@ -69,11 +69,11 @@ class GithubApi
     new_etag = response["ETag"]
     if new_etag
       @etag_cache[path] = new_etag
-      Rails.logger.debug "ETag #{new_etag} cached for path #{path}"
+      puts "ETag #{new_etag} cached for path #{path}"
     end
 
-    Rails.logger.info "Response code: #{response.code}"
-    Rails.logger.info "Rate limit remaining: #{response['x-ratelimit-remaining']}"
+    puts "Response code: #{response.code}"
+    puts "Rate limit remaining: #{response['x-ratelimit-remaining']}"
 
     response
   end

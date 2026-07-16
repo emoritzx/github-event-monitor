@@ -19,7 +19,7 @@ services:
       - debug
 
   # Override production log level
-  poller:
+  data-manager:
     environment:
       RAILS_LOG_LEVEL: debug
 
